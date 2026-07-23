@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Feeds</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        max-width: 900px;
+      }
+
+      .card-header {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+      }
+
+      .card-body {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-body p {
+        font-size: 16px;
+        color: #333;
+      }
+
+      .card-footer {
+        background-color: #f8f9fa;
+        border-top: 1px solid #ddd;
+      }
+
+      .modal-header {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .modal-footer {
+        background-color: #f8f9fa;
+      }
+
+      .btn-outline-secondary {
+        font-weight: bold;
+      }
+
+      .input-group input,
+      .input-group button {
+        border-radius: 20px;
+      }
+
+      .comment-section {
+        margin-top: 20px;
+        background-color: #f1f3f5;
+        border-radius: 8px;
+        padding: 10px;
+      }
+
+      .list-group-item {
+        border: none;
+        background-color: #f1f3f5;
+      }
+
+      .alert {
+        margin-top: 20px;
+      }
+
+      .mb-3 {
+        margin-bottom: 20px;
+      }
+
+      .feed-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container mt-4">
+      <h2 class="mb-4 text-center text-primary">User Feeds</h2>
+      <a
+        href="/chatscreen"
+        class="btn btn-link text-decoration-none mb-3 d-block text-center"
+        >Chat</a
+      >
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <div class="alert alert-warning" role="alert">{{ messages[0] }}</div>
+      {% endif %} {% endwith %}
+
+      <!-- Add Feed Button -->
+      <div class="text-center mb-3">
+        <button
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addFeedModal"
+        >
+          <i class="bi bi-plus-circle"></i> Add Feed
+        </button>
+      </div>
+
+      <!-- Add Feed Modal -->
+      <div
+        class="modal fade"
+        id="addFeedModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <form
+            class="modal-content"
+            method="POST"
+            action="{{ url_for('add_feed') }}"
+          >
+            <div class="modal-header">
+              <h5 class="modal-title">New Feed</h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <textarea
+                name="feeds"
+                class="form-control mb-2"
+                placeholder="What's on your mind?"
+                required
+              ></textarea>
+              <input type="hidden" name="uid" value="1" />
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Post</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Feed Display -->
+      {% for feed in feeds %}
+      <div class="card mb-3 shadow-sm">
+        <div class="card-header">
+          <strong>{{ feed[4] }}</strong> - {{ feed[3] }}
+        </div>
+        <div class="card-body">
+          <p>{{ feed[1] }}</p>
+
+          <form
+            method="POST"
+            action="{{ url_for('add_comment', fid=feed[0]) }}"
+          >
+            <div class="input-group mb-3">
+              <input
+                name="comment"
+                class="form-control"
+                placeholder="Add a comment..."
+                required
+              />
+              <input type="hidden" name="uid" value="1" />
+              <button class="btn btn-outline-secondary" type="submit">
+                <i class="bi bi-chat-dots"></i> Comment
+              </button>
+            </div>
+          </form>
+
+          {% if comments[feed[0]] %}
+          <div class="comment-section">
+            <strong>Comments:</strong>
+            <ul class="list-group list-group-flush">
+              {% for c in comments[feed[0]] %}
+              <li class="list-group-item">
+                <strong>{{ c.uname }}:</strong> {{ c.text }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-footer text-muted feed-actions">
+          <span>Posted on {{ feed[3] }}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bootstrap JS and Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
+  </body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat & Datalist</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+      }
+      .container {
+        max-width: 800px;
+        margin-top: 30px;
+      }
+      .chat-box {
+        height: 400px;
+        overflow-y: auto;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+      }
+      .message {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .message .msg-content {
+        max-width: 75%;
+        padding: 12px;
+        border-radius: 15px;
+        font-size: 14px;
+        line-height: 1.5;
+        word-wrap: break-word;
+      }
+      .sent {
+        justify-content: flex-end;
+      }
+      .sent .msg-content {
+        background: #007bff;
+        color: white;
+        border-top-right-radius: 0;
+      }
+      .received {
+        justify-content: flex-start;
+      }
+      .received .msg-content {
+        background: #e9ecef;
+        color: black;
+        border-top-left-radius: 0;
+      }
+      .input-area {
+        display: flex;
+        margin-top: 10px;
+      }
+      .input-area input[type="text"] {
+        flex: 1;
+        border-radius: 25px;
+        margin-right: 10px;
+      }
+      .input-area input[type="file"] {
+        flex: 1;
+        border-radius: 25px;
+      }
+      .input-area button {
+        border-radius: 25px;
+        font-weight: bold;
+        padding: 10px 20px;
+        margin-left: 10px;
+      }
+      .datalist-container {
+        margin-bottom: 20px;
+      }
+      .datalist-container label {
+        font-weight: 600;
+      }
+      .chat-box::-webkit-scrollbar {
+        width: 8px;
+      }
+      .chat-box::-webkit-scrollbar-thumb {
+        background-color: #007bff;
+        border-radius: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="text-center mb-4">Chat & Datalist</h2>
+      <a
+        href="/viewfeed"
+        class="btn btn-link text-decoration-none mb-3 d-block text-center"
+        >View Feed</a
+      >
+
+      <!-- Datalist Input -->
+      <div class="datalist-container">
+        <label for="user-input" class="form-label">Search Users:</label>
+        <select id="user-input" class="form-control">
+          <option>Select user</option>
+          {% for item in e %}
+          <option value="{{ item[0] }}">{{ item[1] +"-"+ item[2] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Chat Box -->
+      <div class="chat-box" id="chat-box"></div>
+
+      <!-- Message Input -->
+      <div class="input-area">
+        <input
+          type="text"
+          class="form-control"
+          id="message-input"
+          placeholder="Type a message..."
+        />
+        <input
+          type="file"
+          id="file-input"
+          class="form-control ms-2"
+          accept="image/*,video/*,application/pdf"
+        />
+        <button class="btn btn-primary ms-2" id="send-btn">Send</button>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+    <script>
+      $(document).ready(function () {
+        function getchat(id) {
+          $.post({
+            url: "/getchat",
+            data: { toid: id },
+            success: function (response) {
+              var data = JSON.parse(response);
+              var chatBox = $("#chat-box");
+              chatBox.empty();
+              try {
+                $("#send-btn").prop("disabled", data.block[3] >= 3);
+              } catch (erro) {}
+              data.chat.forEach((chat) => {
+                var isSent = parseInt(id) !== chat[1];
+
+                var message = `<div class="message ${
+                  isSent ? "sent" : "received"
+                }">`;
+
+                if (chat[5]) {
+                  var fileExtension = chat[5].split(".").pop().toLowerCase();
+                  if (["jpg", "jpeg", "png", "gif"].includes(fileExtension)) {
+                    message += `<img src="/uploads/${chat[5]}" width="150" class="rounded">`;
+                  } else if (["mp4", "webm"].includes(fileExtension)) {
+                    message += `<video width="150" controls><source src="/uploads/${chat[5]}" type="video/${fileExtension}"></video>`;
+                  } else if (fileExtension === "pdf") {
+                    message += `<a href="/uploads/${chat[5]}" target="_blank">📄 View PDF</a>`;
+                  } else {
+                    message += `<a href="/uploads/${chat[5]}" download>📁 Download File</a>`;
+                  }
+                }
+
+                message += `<div class="msg-content">${chat[3]}<br/>${chat[4]}</div></div>`;
+                chatBox.append(message);
+              });
+
+              chatBox.scrollTop(chatBox[0].scrollHeight);
+            },
+          });
+        }
+
+        $("#user-input").change(function () {
+          var k = $(this).val();
+          getchat(k);
+        });
+
+        $("#send-btn").click(function () {
+          var id = $("#user-input").val();
+          var message = $("#message-input").val();
+          var fileInput = $("#file-input")[0].files[0];
+
+          if (!message.trim() && !fileInput) return;
+
+          var formData = new FormData();
+          formData.append("receiverid", id);
+          formData.append("message", message);
+          formData.append("status", "s");
+          if (fileInput) {
+            formData.append("file", fileInput);
+          }
+
+          $.ajax({
+            url: "/insertchat",
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (e) {
+              if (e === "Message Sent") {
+                $("#message-input").val("").focus();
+                $("#file-input").val("");
+              } else {
+                alert(e["data"] + e["type"]);
+              }
+              getchat(id);
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

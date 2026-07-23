@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+*.exe
+*.py[cod]
+
+# Uploads generated while running
+uploads/
+
+# Output files
+output/
+
+# VS Code settings
+.vscode/
+
+# IDE files
+.idea/
+
+# Logs
+*.log
