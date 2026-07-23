@@ -343,27 +343,19 @@ The model analyzes contextual meaning using bidirectional attention, enabling mo
 
 # 📸 Screenshots
 
-## Home Page
+## Screenshots
 
-> Add `screenshots/home-page.jpg`
+### Home Page
+![Home Page](screenshots/home-page.jpg)
 
----
+### Login Page
+![Login Page](screenshots/login-page.jpg)
 
-## Login Page
+### Registration Page
+![Registration Page](screenshots/registration-page.jpg)
 
-> Add `screenshots/login-page.jpg`
-
----
-
-## Registration Page
-
-> Add `screenshots/registration-page.jpg`
-
----
-
-## Prediction Page
-
-> Add `screenshots/cyberbullying-prediction-page.tiff`
+### Cyberbullying Prediction Page
+![Cyberbullying Prediction Page](screenshots/cyberbullying-prediction-page.jpg)
 
 ---
 
