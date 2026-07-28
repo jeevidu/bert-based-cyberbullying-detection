@@ -8,6 +8,10 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 import pickle
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_DIR = BASE_DIR / "models"
 vectoriser = pickle.load(open(MODEL_DIR / "vectorizer.pkl", "rb"))
 model = pickle.load(open(MODEL_DIR / "model.pkl", "rb"))
 
