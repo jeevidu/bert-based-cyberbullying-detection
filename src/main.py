@@ -23,8 +23,8 @@ app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)  # Create folder if not exists
-from prediction import *
-from db import *    
+from src.prediction import *
+from src.db import *    
 def connect():
 #     return mysql.connector.connect(host="localhost", user="root",  password="",  database="chat",auth_plugin = 'mysql_native_password',port='3306')
         return sqlite3.connect("../database/chat.db")
