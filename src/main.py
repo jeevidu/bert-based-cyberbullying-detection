@@ -2,6 +2,15 @@
 from flask_cors import CORS
 from flask import *
 from pathlib import Path
+import sqlite3
+import os
+import datetime
+import nltk
+from werkzeug.utils import secure_filename
+
+# NLTK setup for Render
+nltk.data.path.append("/opt/render/nltk_data")
+nltk.download("vader_lexicon", download_dir="/opt/render/nltk_data")
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,23 +19,19 @@ app = Flask(
     template_folder=str(BASE_DIR / "templates"),
     static_folder=str(BASE_DIR / "static")
 )
+
 cors = CORS(app)
+
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SECRET_KEY'] = 'your_secret_key'
-import sqlite3 
-import os
-import datetime
-from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = BASE_DIR / "uploads"
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 
 UPLOAD_FOLDER.mkdir(exist_ok=True)
+
 from src.prediction import *
 
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 def connect():
     db_path = BASE_DIR / "database" / "chat.db"
