@@ -263,20 +263,12 @@ def uploaded_file(filename):
 #     text = re.sub(r'[^a-zA-Z0-9\s:]', '', text)
 #     return text
 def textfromimage(input_image_path):
-    print(input_image_path)
-    import pytesseract
-    from PIL import Image, ImageEnhance, ImageFilter
-
-    # Path to Tesseract executable (Update this path if Tesseract is not in your system's PATH)
     import platform
 
     if platform.system() == "Windows":
-    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
+        pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
 
-    # Load the image
-    
     processed_image_path = BASE_DIR / "uploads" / "temp2.png"
-
     # Open the image
     im = Image.open(input_image_path)
 
