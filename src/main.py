@@ -24,6 +24,10 @@ app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 UPLOAD_FOLDER.mkdir(exist_ok=True)
 from src.prediction import *
 
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 def connect():
     db_path = BASE_DIR / "database" / "chat.db"
     return sqlite3.connect(db_path)
