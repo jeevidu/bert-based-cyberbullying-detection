@@ -17,6 +17,13 @@ A Flask-based web application that detects cyberbullying in text messages, image
 
 ---
 
+## 🌐 Live Demo
+
+🚀 Deployed Application:  
+https://bert-based-cyberbullying-detection.onrender.com/
+
+---
+
 # 📖 Table of Contents
 
 - About
