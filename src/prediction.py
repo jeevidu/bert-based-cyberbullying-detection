@@ -8,6 +8,8 @@ from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 from nltk.stem import WordNetLemmatizer
 import pickle
+vectoriser = pickle.load(open(MODEL_DIR / "vectorizer.pkl", "rb"))
+model = pickle.load(open(MODEL_DIR / "model.pkl", "rb"))
 
 nltk.download('stopwords')
 nltk.download('wordnet')
@@ -87,9 +89,9 @@ def prediction(text):
     text = pd.Series(text)
     text = preprocess(text)
     text = pd.Series(text)
-    vectoriser = pickle.load(open("../models/vectorizer.pkl", "rb"))
+    vectoriser = pickle.load(open(MODEL_DIR / "vectorizer.pkl", "rb"))
     text = vectoriser.transform(text)
-    model = pickle.load(open("../models/model.pkl", "rb"))
+    model = pickle.load(open(MODEL_DIR / "model.pkl", "rb"))
     prediction = model.predict(text)
     prediction = prediction[0]
 

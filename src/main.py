@@ -18,18 +18,11 @@ import os
 import datetime
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = "../uploads"  # Directory to save files
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+UPLOAD_FOLDER = BASE_DIR / "uploads"
+app.config["UPLOAD_FOLDER"] = str(UPLOAD_FOLDER)
 
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)  # Create folder if not exists
+UPLOAD_FOLDER.mkdir(exist_ok=True)
 from src.prediction import *
-from src.db import *    
-def connect():
-#     return mysql.connector.connect(host="localhost", user="root",  password="",  database="chat",auth_plugin = 'mysql_native_password',port='3306')
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 def connect():
     db_path = BASE_DIR / "database" / "chat.db"
@@ -99,7 +92,8 @@ def predict_text(text):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
         model = BertForSequenceClassification.from_pretrained("bert-base-uncased", num_labels=2)  # Adjust labels
-        model.load_state_dict(torch.load("../models/modelBert1.pth", map_location=device))
+        MODEL_PATH = BASE_DIR / "models" / "modelBert1.pth"
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=device))
         model.to(device)
         model.eval()
 
@@ -274,11 +268,14 @@ def textfromimage(input_image_path):
     from PIL import Image, ImageEnhance, ImageFilter
 
     # Path to Tesseract executable (Update this path if Tesseract is not in your system's PATH)
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe'
+    import platform
+
+    if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe"
 
     # Load the image
     
-    processed_image_path = "../uploads/temp2.png"
+    processed_image_path = BASE_DIR / "uploads" / "temp2.png"
 
     # Open the image
     im = Image.open(input_image_path)
@@ -344,7 +341,8 @@ def insertchat():
     if "file" in request.files:
         file = request.files["file"]
         if file.filename != "":
-            file.save("../static/"+file.filename)  # Save the file
+            file_path = BASE_DIR / "static" / file.filename
+            file.save(file_path)
             text=textfromimage("../static/"+file.filename)
             filename=file.filename
             try:
