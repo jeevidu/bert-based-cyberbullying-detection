@@ -12,15 +12,14 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 MODEL_DIR = BASE_DIR / "models"
-vectoriser = pickle.load(open(MODEL_DIR / "vectorizer.pkl", "rb"))
-model = pickle.load(open(MODEL_DIR / "model.pkl", "rb"))
-
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('punkt')
-nltk.download('omw-1.4')
-nltk.download('punkt_tab')
-nltk.download('vader_lexicon')
+vectoriser = None
+model = None
+#nltk.download('stopwords')
+#nltk.download('wordnet')
+#nltk.download('punkt')
+#nltk.download('omw-1.4')
+#nltk.download('punkt_tab')
+#nltk.download('vader_lexicon')
 def strip_emoji(text):
     return emoji.replace_emoji(text,replace="")
 
@@ -89,6 +88,13 @@ def preprocess(text):
     return text
 
 def prediction(text):
+    global vectoriser, model
+
+    if vectoriser is None:
+        vectoriser = pickle.load(open(MODEL_DIR / "vectorizer.pkl", "rb"))
+
+    if model is None:
+        model = pickle.load(open(MODEL_DIR / "model.pkl", "rb"))
     print(text)
     text = pd.Series(text)
     text = preprocess(text)
