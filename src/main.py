@@ -27,7 +27,13 @@ from src.prediction import *
 from src.db import *    
 def connect():
 #     return mysql.connector.connect(host="localhost", user="root",  password="",  database="chat",auth_plugin = 'mysql_native_password',port='3306')
-        return sqlite3.connect("../database/chat.db")
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+def connect():
+    db_path = BASE_DIR / "database" / "chat.db"
+    return sqlite3.connect(db_path)
 def get_user_age_by_id(uid):
     conn = connect()
     cursor = conn.cursor()
